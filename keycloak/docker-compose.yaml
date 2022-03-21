@@ -1,0 +1,15 @@
+version: '3'
+services:
+  keycloak-dev:
+      image: quay.io/keycloak/keycloak:17.0.0
+      environment:
+        KC_DB: postgres
+        KC_DB_URL: jdbc:postgresql://postgres-dev:5432/keycloak
+        KC_DB_SCHEMA: public
+        KC_DB_USERNAME: postgres
+        KC_DB_PASSWORD: postgres
+        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN_PASSWORD: admin
+      entrypoint: /opt/keycloak/bin/kc.sh start-dev
+      ports:
+        - 8081:8080
