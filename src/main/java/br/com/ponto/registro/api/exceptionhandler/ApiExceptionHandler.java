@@ -9,6 +9,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import br.com.ponto.registro.api.exceptionhandler.ErroDTO.Validacao;
 import br.com.ponto.registro.domain.exception.AcessoNaoAutorizadoException;
+import br.com.ponto.registro.domain.exception.AcessoNegadoException;
+import br.com.ponto.registro.domain.exception.AplicacaoException;
+import br.com.ponto.registro.domain.exception.ConflitoException;
 import br.com.ponto.registro.domain.exception.ValidacaoException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,6 +43,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	}
 
+	@ExceptionHandler(AplicacaoException.class)
+	public final ResponseEntity<ErroDTO> handlerAplicacaoExceptions(AplicacaoException ex, WebRequest request) {
+		log.error("Ocorreu um erro de na aplicação: ", ex);
+		ErroDTO mensagem = ErroDTO.builder().mensagem(ex.getMessage()).build();
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mensagem);
+	}
+	
 	@ExceptionHandler(ValidacaoException.class)
 	public final ResponseEntity<ErroDTO> handlerValidacaoExceptions(ValidacaoException ex, WebRequest request) {
 		log.error("Ocorreu um erro de validação: ", ex);
@@ -47,11 +58,37 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(AcessoNaoAutorizadoException.class)
-	public final ResponseEntity<ErroDTO> handlerAcessoNaoAutorizadoException(AcessoNaoAutorizadoException ex, WebRequest request) {
+	public final ResponseEntity<ErroDTO> handlerAcessoNaoAutorizadoExceptions(AcessoNaoAutorizadoException ex, WebRequest request) {
 		log.error("Ocorreu um erro de autorização: ", ex);
 		
 		ErroDTO response = ErroDTO.builder().mensagem(ex.getMessage()).build();
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+	}
+	
+	@ExceptionHandler(AcessoNegadoException.class)
+	public final ResponseEntity<ErroDTO> handlerAcessoegadoExceptions(AcessoNaoAutorizadoException ex, WebRequest request) {
+		log.error("Ocorreu um erro de autorização: ", ex);
+		
+		ErroDTO response = ErroDTO.builder().mensagem(ex.getMessage()).build();
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+	}
+	
+	@ExceptionHandler(ConflitoException.class)
+	public final ResponseEntity<ErroDTO> handlerConflitoExceptions(ConflitoException ex, WebRequest request) {
+		log.error("Ocorreu um erro de autorização: ", ex);
+		
+		ErroDTO response = ErroDTO.builder().mensagem(ex.getMessage()).build();
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+	}
+	
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<?> handlerAcessoegadoExceptions(AccessDeniedException ex, WebRequest request) {
+		log.error("Ocorreu um erro de autorização: ", ex);
+		
+		String mensagem = "Você não tem acesso a essa operação.";
+		ErroDTO response = ErroDTO.builder().mensagem(mensagem).build();
+
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
 	}
 	
 	@Override
@@ -65,7 +102,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			return ErroDTO.ValidacaoOf(campo.getField(), mensagem);
 		}).collect(Collectors.toSet());
 		
-		ErroDTO response = ErroDTO.builder().errosValidacao(validacoes).build();
+		ErroDTO response = ErroDTO.builder().validacoes(validacoes).build();
 		return ResponseEntity.status(status).body(response);
 	}
 }

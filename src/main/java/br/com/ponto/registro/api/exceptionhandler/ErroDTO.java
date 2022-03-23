@@ -14,7 +14,7 @@ import lombok.Getter;
 public class ErroDTO {
 
 	private String mensagem;
-	private Set<Validacao> errosValidacao;
+	private Set<Validacao> validacoes;
 	
 	public static Validacao ValidacaoOf(final String campo, final String mensagem) {
 		return Validacao.builder()
