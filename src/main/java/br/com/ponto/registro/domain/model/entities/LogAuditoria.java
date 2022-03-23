@@ -56,12 +56,6 @@ public class LogAuditoria implements Serializable {
 	@Column(name = "usuario_logado")
 	private String usuario;
 	
-	@Override
-	public int hashCode() {
-		return Objects.hash(dataOcorrencia, id, entidade, operacao, usuario);
-	}
-	
-	@Builder
 	public static LogAuditoria ofInclusao(final String usuario, final String entidade) {
 		
 		LocalDateTime horario = LocalDateTime.now();
@@ -81,6 +75,11 @@ public class LogAuditoria implements Serializable {
 		
 		return log;
 	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(dataOcorrencia, id, entidade, operacao, usuario);
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -94,5 +93,11 @@ public class LogAuditoria implements Serializable {
 		return Objects.equals(dataOcorrencia, other.dataOcorrencia) && Objects.equals(id, other.id)
 				&& Objects.equals(entidade, other.entidade) && operacao == other.operacao
 				&& Objects.equals(usuario, other.usuario);
+	}
+	
+	@Override
+	public String toString() {
+		return "LogAuditoria [id=" + id + ", entidade=" + entidade + ", operacao=" + operacao + ", dataOcorrencia="
+				+ dataOcorrencia + ", usuario=" + usuario + "]";
 	}
 }
