@@ -38,11 +38,14 @@ public class PontoEletronico implements Serializable {
 	@NotNull
 	private LocalDateTime horario;	
 	
-	public static PontoEletronico of(final String usuario, final LocalDateTime horario) {
+	@NotBlank
+	private String descricao;
+	
+	public static PontoEletronico of(final String usuario, final LocalDateTime horario, final String descricao) {
 		PontoEletronico ponto = new PontoEletronico();
 		ponto.setUsuario(usuario);
 		ponto.setHorario(horario);
-		
+		ponto.setDescricao(descricao);
 		return ponto;
 	}
 	

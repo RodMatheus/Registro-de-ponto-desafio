@@ -40,7 +40,6 @@ public class LogAuditoria implements Serializable {
 	private String evento;
 	
 	@NotBlank
-    @Column(name = "entidade_original")
 	private String entidade;
 	
 	@NotNull
