@@ -18,12 +18,11 @@ import javax.validation.constraints.Size;
 import br.com.ponto.registro.domain.model.constants.OperacaoAuditoria;
 import br.com.ponto.registro.domain.model.converters.OperacaoAuditoriaConverter;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(schema = "ponto", name = "ponto_eletronico")
+@Table(schema = "ponto", name = "log_auditoria")
 @Getter
 @Setter(value = AccessLevel.PRIVATE)
 public class LogAuditoria implements Serializable {
