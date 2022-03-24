@@ -1,6 +1,7 @@
 package br.com.ponto.registro.domain.service;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -48,39 +49,45 @@ public class PontoService {
 		PontoEletronico ponto = PontoEletronico.of(usuarioLogado, horario, descricao);
 
 		log.info("Cadastrando o lançamento. LANÇAMENTO: {}.", ponto);
-		PontoEletronico pontoSalvo = pontoEletronicoRepository.save(ponto);
+		pontoEletronicoRepository.save(ponto);
 		
 		log.info("Gerando log de operação.");
-		LogAuditoria log = LogAuditoria.ofInclusao(usuarioLogado, ServiceUtils.convertToJson(pontoSalvo));
+		LogAuditoria log = LogAuditoria.ofInclusao(usuarioLogado, ServiceUtils.convertToJson(ponto));
 		logAuditoriaRepository.save(log);
 	}
 
 	private void validaFinalSemana(final LocalDateTime horarioInformado) {
 		if (horarioInformado.getDayOfWeek().equals(DayOfWeek.SATURDAY)
 				|| horarioInformado.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-			new ValidacaoException("Não é permitido o lançamento de horas durante o final de semana.");
+			 throw new ValidacaoException("Não é permitido o lançamento de horas durante o final de semana.");
 		}
 	}
 
-	private void validaLimiteAlmocoEConflito(final String usuarioLogado, LocalDateTime horarioInformado) {
-		List<PontoEletronico> horarios = pontoEletronicoRepository.findByUsuarioToday(usuarioLogado);
-		if (!CollectionUtils.isEmpty(horarios) && horarios.size() == 4) {
-			throw new AcessoNegadoException("Apenas 4 horários podem ser registrados por dia.");
-		}
+	private void validaLimiteAlmocoEConflito(final String usuarioLogado, final LocalDateTime horarioInformado) {
+		final LocalDate dataCorrente = (horarioInformado.getDayOfMonth() < LocalDate.now().getDayOfMonth())
+				? horarioInformado.toLocalDate()
+				: LocalDate.now();
 
-		if (!CollectionUtils.isEmpty(horarios) && horarios.size() == 2) {
-			LocalDateTime pontoAnterior = horarios.get(horarios.size() - 1).getHorario();
-			if (ChronoUnit.HOURS.between(pontoAnterior, horarioInformado) <= 0) {
-				throw new ValidacaoException("O intervalo de almoço deve ser de pelo menos 1 hora.");
+		final List<PontoEletronico> horarios = pontoEletronicoRepository
+				.findByUsuarioData(usuarioLogado,dataCorrente);
+		if (!CollectionUtils.isEmpty(horarios)) {
+			if (horarios.size() == 4) {
+				throw new AcessoNegadoException("Apenas 4 horários podem ser registrados por dia.");
 			}
-		}
 
-		horarios
-			.stream()
-			.filter(horario -> horario.getHorario().isEqual(horarioInformado))
-			.findFirst()
-				.ifPresent(horario -> {
-					throw new ConflitoException("Horário já registrado.");
-				});
+			if (horarios.size() == 2) {
+				LocalDateTime pontoAnterior = horarios.get(horarios.size() - 1).getHorario();
+				if (ChronoUnit.HOURS.between(pontoAnterior, horarioInformado) <= 0) {
+					throw new ValidacaoException("O intervalo de almoço deve ser de pelo menos 1 hora.");
+				}
+			}
+
+			horarios.stream()
+				.filter(horario -> horario.getHorario().isEqual(horarioInformado))
+				.findFirst()
+					.ifPresent(horario -> {
+						throw new ConflitoException("Horário já registrado.");
+					});
+		}
 	}
 }

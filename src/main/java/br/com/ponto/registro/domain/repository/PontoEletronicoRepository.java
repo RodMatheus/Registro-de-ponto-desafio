@@ -1,5 +1,6 @@
 package br.com.ponto.registro.domain.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,6 @@ public interface PontoEletronicoRepository extends JpaRepository<PontoEletronico
 
 	@Query("FROM PontoEletronico pe "
 			+ "WHERE pe.usuario = :usuarioLogado "
-			+ "AND DATE(pe.horario) = CURRENT_DATE")
-	List<PontoEletronico> findByUsuarioToday(String usuarioLogado);
+			+ "AND DATE(pe.horario) = :dataCorrente")
+	List<PontoEletronico> findByUsuarioData(final String usuarioLogado, final LocalDate dataCorrente);
 }
