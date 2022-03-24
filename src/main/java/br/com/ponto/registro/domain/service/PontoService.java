@@ -21,8 +21,8 @@ import br.com.ponto.registro.domain.repository.LogAuditoriaRepository;
 import br.com.ponto.registro.domain.repository.PontoEletronicoRepository;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
 @Slf4j
+@Service
 public class PontoService {
 
 	private final PontoEletronicoRepository pontoEletronicoRepository;
