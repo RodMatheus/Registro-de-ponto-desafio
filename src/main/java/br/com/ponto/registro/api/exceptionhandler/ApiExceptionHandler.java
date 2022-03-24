@@ -66,8 +66,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(AcessoNegadoException.class)
-	public final ResponseEntity<ErroDTO> handlerAcessoegadoExceptions(AcessoNaoAutorizadoException ex, WebRequest request) {
-		log.error("Ocorreu um erro de autorização: ", ex);
+	public final ResponseEntity<ErroDTO> handlerAcessoegadoExceptions(AcessoNegadoException ex, WebRequest request) {
+		log.error("Ocorreu um erro de acesso: ", ex);
 		
 		ErroDTO response = ErroDTO.builder().mensagem(ex.getMessage()).build();
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
@@ -75,7 +75,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(ConflitoException.class)
 	public final ResponseEntity<ErroDTO> handlerConflitoExceptions(ConflitoException ex, WebRequest request) {
-		log.error("Ocorreu um erro de autorização: ", ex);
+		log.error("Ocorreu um erro de conflito: ", ex);
 		
 		ErroDTO response = ErroDTO.builder().mensagem(ex.getMessage()).build();
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
@@ -83,7 +83,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<?> handlerAcessoegadoExceptions(AccessDeniedException ex, WebRequest request) {
-		log.error("Ocorreu um erro de autorização: ", ex);
+		log.error("Ocorreu um erro de acesso: ", ex);
 		
 		String mensagem = "Você não tem acesso a essa operação.";
 		ErroDTO response = ErroDTO.builder().mensagem(mensagem).build();
@@ -97,10 +97,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 		log.error("Ocorreram erros de validação: ", ex);
 		
-		Set<Validacao> validacoes = ex.getBindingResult().getFieldErrors().stream().map(campo -> {
-			String mensagem = messageSource.getMessage(campo, LocaleContextHolder.getLocale());
-			return ErroDTO.ValidacaoOf(campo.getField(), mensagem);
-		}).collect(Collectors.toSet());
+		Set<Validacao> validacoes = ex.getBindingResult().getFieldErrors().stream()
+				.map(campo -> {
+					String mensagem = messageSource.getMessage(campo, LocaleContextHolder.getLocale());
+					return ErroDTO.ValidacaoOf(campo.getField(), mensagem);
+					})
+				.collect(Collectors.toSet());
 		
 		ErroDTO response = ErroDTO.builder().validacoes(validacoes).build();
 		return ResponseEntity.status(status).body(response);
