@@ -34,96 +34,106 @@ import br.com.ponto.registro.domain.service.PontoService;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PontoService.class)
 public class PontoServiceTest {
-	
+
 	private static final LocalDateTime DATA_HORA_FIM_DE_SEMANA_SABADO = LocalDateTime.of(2022, Month.MARCH, 19, 9, 0);
-	private static final LocalDateTime DATA_HORA_FIM_DE_SEMANA_DOMINGO= LocalDateTime.of(2022, Month.MARCH, 20, 9, 0);
+	private static final LocalDateTime DATA_HORA_FIM_DE_SEMANA_DOMINGO = LocalDateTime.of(2022, Month.MARCH, 20, 9, 0);
 	private static final LocalDateTime DATA_HORA = LocalDateTime.of(2022, Month.MARCH, 21, 9, 0);
 	private static final LocalDateTime DATA_HORA_ALMOCO = LocalDateTime.of(2022, Month.MARCH, 21, 12, 0);
 
 	private static final String DESCRICAO_DE_LANCAMENTO = "Lançando horas!";
-	
-	private static final List<PontoEletronico> LISTA_HORARIO_UNICO= List.of(PontoEletronico.of("teste", DATA_HORA, "teste"));
-	
-	private static final List<PontoEletronico> LISTA_HORARIO_ALMOCO= List.of(PontoEletronico.of("teste", DATA_HORA, "teste"),
-			PontoEletronico.of("teste", DATA_HORA_ALMOCO, "teste"));
-	
-	private static final List<PontoEletronico> LISTA_LIMITE_MAXIMO = List.of(PontoEletronico.of("teste", LocalDateTime.now(), "teste"),
-			PontoEletronico.of("teste", LocalDateTime.now(), "teste"), PontoEletronico.of("teste", LocalDateTime.now(), "teste"),
+
+	private static final List<PontoEletronico> LISTA_HORARIO_UNICO = List
+			.of(PontoEletronico.of("teste", DATA_HORA, "teste"));
+
+	private static final List<PontoEletronico> LISTA_HORARIO_ALMOCO = List.of(
+			PontoEletronico.of("teste", DATA_HORA, "teste"), PontoEletronico.of("teste", DATA_HORA_ALMOCO, "teste"));
+
+	private static final List<PontoEletronico> LISTA_LIMITE_MAXIMO = List.of(
+			PontoEletronico.of("teste", LocalDateTime.now(), "teste"),
+			PontoEletronico.of("teste", LocalDateTime.now(), "teste"),
+			PontoEletronico.of("teste", LocalDateTime.now(), "teste"),
 			PontoEletronico.of("teste", LocalDateTime.now(), "teste"));
 
 	@MockBean
-    private PontoEletronicoRepository pontoEletronicoRepository;
-	
+	private PontoEletronicoRepository pontoEletronicoRepository;
+
 	@MockBean
-    private LogAuditoriaRepository logAuditoriaRepository;
-	
+	private LogAuditoriaRepository logAuditoriaRepository;
+
 	@Mock
 	private SecurityContext securityContext;
-	
+
 	@Mock
 	private Authentication authentication;
-	
+
 	@Mock
 	private Jwt jwt;
-	
+
 	@BeforeEach
 	public void setup() {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}
-	
+
 	@Test
 	public void deveRetornarErroDeFimDeSemana_sabado() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 
 		PontoService pontoService = newPontoService();
-		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA_FIM_DE_SEMANA_SABADO, DESCRICAO_DE_LANCAMENTO);
-		
+		Executable executable = () -> pontoService.cadastraPonto(
+				DATA_HORA_FIM_DE_SEMANA_SABADO,
+				DESCRICAO_DE_LANCAMENTO);
+
 		assertThrows(ValidacaoException.class, executable);
 	}
-	
+
 	@Test
 	public void deveRetornarErroDeFimDeSemana_domingo() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 
 		PontoService pontoService = newPontoService();
-		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA_FIM_DE_SEMANA_DOMINGO, DESCRICAO_DE_LANCAMENTO);
-		
+		Executable executable = () -> pontoService.cadastraPonto(
+				DATA_HORA_FIM_DE_SEMANA_DOMINGO, DESCRICAO_DE_LANCAMENTO);
+
 		assertThrows(ValidacaoException.class, executable);
 	}
-	
+
 	@Test
 	public void deveRetornarErroDeLimiteDeLancamentos() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
-		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate())).thenReturn(LISTA_LIMITE_MAXIMO);
+		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
+				.thenReturn(LISTA_LIMITE_MAXIMO);
 
 		PontoService pontoService = newPontoService();
 		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA, DESCRICAO_DE_LANCAMENTO);
-		
+
 		assertThrows(AcessoNegadoException.class, executable);
 	}
-	
+
 	@Test
 	public void deveRetornarErroDeHoraAlmoco() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
-		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate())).thenReturn(LISTA_HORARIO_ALMOCO);
+		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
+				.thenReturn(LISTA_HORARIO_ALMOCO);
 
 		PontoService pontoService = newPontoService();
-		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA_ALMOCO.plusMinutes(55), DESCRICAO_DE_LANCAMENTO);
-		
+		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA_ALMOCO.plusMinutes(55),
+				DESCRICAO_DE_LANCAMENTO);
+
 		assertThrows(ValidacaoException.class, executable);
 	}
-	
+
 	@Test
 	public void deveRetornarErroDeHorarioJaCadastrado() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
-		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate())).thenReturn(LISTA_HORARIO_UNICO);
+		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
+				.thenReturn(LISTA_HORARIO_UNICO);
 
 		PontoService pontoService = newPontoService();
 		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA, DESCRICAO_DE_LANCAMENTO);
-		
+
 		assertThrows(ConflitoException.class, executable);
 	}
-	
+
 	@Test
 	public void deveCadastrarHorario() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
@@ -131,12 +141,12 @@ public class PontoServiceTest {
 
 		PontoService pontoService = newPontoService();
 		pontoService.cadastraPonto(DATA_HORA, DESCRICAO_DE_LANCAMENTO);
-		
+
 		verify(pontoEletronicoRepository, times(1)).findByUsuarioData(null, DATA_HORA.toLocalDate());
 		verify(pontoEletronicoRepository, times(1)).save(any());
 		verify(logAuditoriaRepository, times(1)).save(any());
 	}
-	
+
 	private PontoService newPontoService() {
 		return new PontoService(pontoEletronicoRepository, logAuditoriaRepository);
 	}
