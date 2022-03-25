@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import br.com.ponto.registro.api.v1.PontoEletronicoController;
 import br.com.ponto.registro.api.v1.model.input.PostPontoEletronico;
-import br.com.ponto.registro.domain.service.PontoService;
+import br.com.ponto.registro.domain.service.PontoEletronicoService;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = PontoEletronicoController.class)
@@ -23,7 +23,7 @@ public class PontoEletronicoControllerTest {
 			.build();
 	
 	@MockBean
-	private PontoService pontoService;
+	private PontoEletronicoService pontoService;
 	
 	@Test
 	public void deveCadastrarHorario() {

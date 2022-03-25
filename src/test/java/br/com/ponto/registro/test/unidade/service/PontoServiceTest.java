@@ -29,10 +29,10 @@ import br.com.ponto.registro.domain.exception.ValidacaoException;
 import br.com.ponto.registro.domain.model.entities.PontoEletronico;
 import br.com.ponto.registro.domain.repository.LogAuditoriaRepository;
 import br.com.ponto.registro.domain.repository.PontoEletronicoRepository;
-import br.com.ponto.registro.domain.service.PontoService;
+import br.com.ponto.registro.domain.service.PontoEletronicoService;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = PontoService.class)
+@SpringBootTest(classes = PontoEletronicoService.class)
 public class PontoServiceTest {
 
 	private static final LocalDateTime DATA_HORA_FIM_DE_SEMANA_SABADO = LocalDateTime.of(2022, Month.MARCH, 19, 9, 0);
@@ -78,7 +78,7 @@ public class PontoServiceTest {
 	public void deveRetornarErroDeFimDeSemana_sabado() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 
-		PontoService pontoService = newPontoService();
+		PontoEletronicoService pontoService = newPontoService();
 		Executable executable = () -> pontoService.cadastraPonto(
 				DATA_HORA_FIM_DE_SEMANA_SABADO,
 				DESCRICAO_DE_LANCAMENTO);
@@ -90,7 +90,7 @@ public class PontoServiceTest {
 	public void deveRetornarErroDeFimDeSemana_domingo() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 
-		PontoService pontoService = newPontoService();
+		PontoEletronicoService pontoService = newPontoService();
 		Executable executable = () -> pontoService.cadastraPonto(
 				DATA_HORA_FIM_DE_SEMANA_DOMINGO, DESCRICAO_DE_LANCAMENTO);
 
@@ -103,7 +103,7 @@ public class PontoServiceTest {
 		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
 				.thenReturn(LISTA_LIMITE_MAXIMO);
 
-		PontoService pontoService = newPontoService();
+		PontoEletronicoService pontoService = newPontoService();
 		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA, DESCRICAO_DE_LANCAMENTO);
 
 		assertThrows(AcessoNegadoException.class, executable);
@@ -115,7 +115,7 @@ public class PontoServiceTest {
 		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
 				.thenReturn(LISTA_HORARIO_ALMOCO);
 
-		PontoService pontoService = newPontoService();
+		PontoEletronicoService pontoService = newPontoService();
 		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA_ALMOCO.plusMinutes(55),
 				DESCRICAO_DE_LANCAMENTO);
 
@@ -128,7 +128,7 @@ public class PontoServiceTest {
 		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
 				.thenReturn(LISTA_HORARIO_UNICO);
 
-		PontoService pontoService = newPontoService();
+		PontoEletronicoService pontoService = newPontoService();
 		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA, DESCRICAO_DE_LANCAMENTO);
 
 		assertThrows(ConflitoException.class, executable);
@@ -139,7 +139,7 @@ public class PontoServiceTest {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate())).thenReturn(List.of());
 
-		PontoService pontoService = newPontoService();
+		PontoEletronicoService pontoService = newPontoService();
 		pontoService.cadastraPonto(DATA_HORA, DESCRICAO_DE_LANCAMENTO);
 
 		verify(pontoEletronicoRepository, times(1)).findByUsuarioData(null, DATA_HORA.toLocalDate());
@@ -147,7 +147,7 @@ public class PontoServiceTest {
 		verify(logAuditoriaRepository, times(1)).save(any());
 	}
 
-	private PontoService newPontoService() {
-		return new PontoService(pontoEletronicoRepository, logAuditoriaRepository);
+	private PontoEletronicoService newPontoService() {
+		return new PontoEletronicoService(pontoEletronicoRepository, logAuditoriaRepository);
 	}
 }

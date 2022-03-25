@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ponto.registro.api.v1.model.input.PostPontoEletronico;
 import br.com.ponto.registro.core.security.CheckSecurity;
-import br.com.ponto.registro.domain.service.PontoService;
+import br.com.ponto.registro.domain.service.PontoEletronicoService;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController(value = "Controle de horários")
@@ -21,10 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PontoEletronicoController {
 
-	private final PontoService pontoService;
+	private final PontoEletronicoService pontoService;
 	
 	@Autowired
-	public PontoEletronicoController(PontoService pontoService) {
+	public PontoEletronicoController(PontoEletronicoService pontoService) {
 		this.pontoService = pontoService;
 	}
 	

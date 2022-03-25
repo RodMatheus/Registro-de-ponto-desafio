@@ -23,13 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class PontoService {
+public class PontoEletronicoService {
 
 	private final PontoEletronicoRepository pontoEletronicoRepository;
 	private final LogAuditoriaRepository logAuditoriaRepository;
 
 	@Autowired
-	public PontoService(PontoEletronicoRepository pontoEletronicoRepository,
+	public PontoEletronicoService(PontoEletronicoRepository pontoEletronicoRepository,
 			 LogAuditoriaRepository logAuditoriaRepository) {
 		this.pontoEletronicoRepository = pontoEletronicoRepository;
 		this.logAuditoriaRepository = logAuditoriaRepository;
