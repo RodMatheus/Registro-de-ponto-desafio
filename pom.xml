@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.6.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.ponto</groupId>
 	<artifactId>registro</artifactId>
@@ -119,7 +120,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			
+
 			<!-- MAPSCTRUCT CONFIG -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -147,14 +148,14 @@
 					</compilerArgs>
 				</configuration>
 			</plugin>
-			
+
 			<!-- TESTES INTEGRADOS CONFIG -->
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<skip>${skipTests}</skip>
 					<argLine>${jacocoArgLine}</argLine>
-                    <reportsDirectory>${project.test.result.directory}/surefire</reportsDirectory>
+					<reportsDirectory>${project.test.result.directory}/surefire</reportsDirectory>
 				</configuration>
 				<executions>
 					<execution>
@@ -172,8 +173,8 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!--  JACOCO CONFIG -->
+
+			<!-- JACOCO CONFIG -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -188,9 +189,9 @@
 							<goal>prepare-agent</goal>
 						</goals>
 						<configuration>
-                            <propertyName>jacocoArgLine</propertyName>
-                            <destFile>${project.test.result.directory}/jacoco/jacoco.exec</destFile>
-                        </configuration>
+							<propertyName>jacocoArgLine</propertyName>
+							<destFile>${project.test.result.directory}/jacoco/jacoco.exec</destFile>
+						</configuration>
 					</execution>
 					<execution>
 						<id>default-report</id>
@@ -199,21 +200,20 @@
 						</goals>
 						<phase>test</phase>
 						<configuration>
-                            <dataFile>${project.test.result.directory}/jacoco/jacoco.exec</dataFile>
-                            <outputDirectory>${project.test.result.directory}/jacoco</outputDirectory>
-                            <excludes>
-                            	<exclude>br/com/ponto/registro/domain/service/ServiceUtils.class</exclude>
-                            	<exclude>br/com/ponto/registro/domain/model/constants/**</exclude>
-                            	<exclude>br/com/ponto/registro/domain/model/converters/**</exclude>
-                            	<exclude>br/com/ponto/registro/domain/exception/**</exclude>
-                            	<exclude>br/com/ponto/registro/core/**</exclude>
-                            	<exclude>br/com/ponto/registro/api/exceptionhandler/**</exclude>
-                            </excludes>
-                        </configuration>
+							<dataFile>${project.test.result.directory}/jacoco/jacoco.exec</dataFile>
+							<outputDirectory>${project.test.result.directory}/jacoco</outputDirectory>
+							<excludes>
+								<exclude>br/com/ponto/registro/domain/service/ServiceUtils.class</exclude>
+								<exclude>br/com/ponto/registro/domain/model/constants/**</exclude>
+								<exclude>br/com/ponto/registro/domain/model/converters/**</exclude>
+								<exclude>br/com/ponto/registro/domain/exception/**</exclude>
+								<exclude>br/com/ponto/registro/core/**</exclude>
+								<exclude>br/com/ponto/registro/api/exceptionhandler/**</exclude>
+							</excludes>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			
 		</plugins>
 	</build>
 
