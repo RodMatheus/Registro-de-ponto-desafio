@@ -28,7 +28,7 @@ public class CorsConfig extends GenericFilterBean {
 
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Origin", "http://localhost");
         response.addHeader("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD, PUT, POST, DELETE, PATCH");
         response.addHeader("Access-Control-Allow-Headers",
                 "Content-Type, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization");

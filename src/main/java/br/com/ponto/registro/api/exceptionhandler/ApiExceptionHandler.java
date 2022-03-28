@@ -82,7 +82,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(AccessDeniedException.class)
-	public ResponseEntity<?> handlerAcessoegadoExceptions(AccessDeniedException ex, WebRequest request) {
+	public ResponseEntity<ErroDTO> handlerAcessoegadoExceptions(AccessDeniedException ex, WebRequest request) {
 		log.error("Ocorreu um erro de acesso: ", ex);
 		
 		String mensagem = "Você não tem acesso a essa operação.";
