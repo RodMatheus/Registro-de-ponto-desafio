@@ -85,8 +85,8 @@ public class PontoEletronicoService {
 			horarios.stream()
 				.filter(horario -> horario.getHorario().isEqual(horarioInformado))
 				.findFirst()
-					.ifPresent(() -> {
-						throw new ConflitoException("Horário já registrado.");
+					.ifPresent(horario -> {
+						throw new ConflitoException("O horário: " + horario.getHorario() + "já registrado.");
 					});
 		}
 	}
