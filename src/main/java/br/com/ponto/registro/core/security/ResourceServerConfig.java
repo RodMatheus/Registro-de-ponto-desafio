@@ -25,7 +25,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.csrf()
-				.disable()
+			.and()
 			.cors()
 			.and()
 				.authorizeRequests()

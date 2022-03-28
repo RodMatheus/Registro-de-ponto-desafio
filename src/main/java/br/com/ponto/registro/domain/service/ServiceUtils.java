@@ -29,8 +29,7 @@ public abstract class ServiceUtils {
 		try {
 			return Optional.of(mapper.writeValueAsString(obj));
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			return Optional.empty();
+			throw new AplicacaoException("Ocorreu um erro ao tentar gerar log de auditoria.");
 		}
 	}
 

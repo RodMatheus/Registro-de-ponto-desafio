@@ -20,6 +20,12 @@
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
 		<mapstruct.processor.version>1.4.2.Final</mapstruct.processor.version>
 		<jacoco.version>0.8.7</jacoco.version>
+		<keycloak.dasniko.version>2.1.2</keycloak.dasniko.version>
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    	<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+    	<sonar.jacoco.reportPath>${project.test.result.directory}/jacoco/jacoco.exec</sonar.jacoco.reportPath>
+    	<sonar.coverage.jacoco.xmlReportPaths>${project.test.result.directory}/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    	<sonar.language>java</sonar.language>
 		<project.test.result.directory>${project.build.directory}/test-results</project.test.result.directory>
 	</properties>
 	<dependencies>
@@ -86,6 +92,17 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.dasniko</groupId>
+			<artifactId>testcontainers-keycloak</artifactId>
+			<version>${keycloak.dasniko.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
