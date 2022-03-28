@@ -1,23 +1,24 @@
 package br.com.ponto.registro.test.integracao;
 
-import java.util.Collections;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.restassured.RestAssured;
+import br.com.ponto.registro.domain.exception.AplicacaoException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,39 +34,47 @@ public class BaseIT extends ResourceIT {
     @BeforeEach
     void setup() {
         this.authServerUrl = keyckloakContainer.getAuthServerUrl() + URL_TOKEN;
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = port;
     }
 	
-	protected String getToken() {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.put("grant_type", Collections.singletonList("password"));
-        map.put("client_id", Collections.singletonList("ponto-client"));
-        map.put("username", Collections.singletonList("rodmatheus96@gmail.com"));
-        map.put("password", Collections.singletonList("asdf1234"));
-        KeyCloakToken token =
-                restTemplate.postForObject(
-                        authServerUrl, new HttpEntity<>(map, httpHeaders), KeyCloakToken.class);
-
-        assert token != null;
-        return token.getAccessToken();
+	protected String getToken() {        
+		try {
+			HttpResponse<String> response  = httpClientOAuth()
+					.send(
+							httpRequestOAuth(this.authServerUrl),
+							BodyHandlers.ofString());
+			return convertAccessToken(response.body());
+		} catch (Exception e) {
+			throw new AplicacaoException("Ocorreu um erro ao buscar o Token de acesso.");
+		}
     }
 	
-	private static class KeyCloakToken {
-
-        private final String accessToken;
-
-        @JsonCreator
-        KeyCloakToken(@JsonProperty("access_token") final String accessToken) {
-            this.accessToken = accessToken;
-        }
-
-        public String getAccessToken() {
-            return accessToken;
-        }
-    }
+	private HttpClient httpClientOAuth() {
+		return HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(5))
+        .followRedirects(Redirect.NORMAL)
+        .build();
+	}
+	
+	private HttpRequest httpRequestOAuth(final String server) {
+		final String authParams = 
+				  "grant_type=password"
+                + "&client_id=ponto-client"
+                + "&username=rodmatheus96@gmail.com"
+                + "&password=asdf1234";
+		
+		return HttpRequest.newBuilder()
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+				.uri(URI.create(server))
+				.POST(BodyPublishers.ofString(authParams))
+				.build();
+	}
+	
+	private String convertAccessToken(final String body) {
+        try {
+			JSONObject json = new JSONObject(body);
+			return json.getString("access_token");
+		} catch (Exception e) {
+			throw new AplicacaoException("Ocorreu um erro ao buscar o Token de acesso."); 
+		}
+	}
 }
