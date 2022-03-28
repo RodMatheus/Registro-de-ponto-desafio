@@ -1,5 +1,8 @@
 package br.com.ponto.registro.test.unidade.api;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import java.time.LocalDateTime;
 import java.time.Month;
 
@@ -30,6 +33,8 @@ public class PontoEletronicoControllerTest {
 		PontoEletronicoController pontoEletronicoController = newPontoEletronicoController();
 		
 		pontoEletronicoController.post(POST_PONTO_ELETRONICO);
+		
+		verify(pontoService, times(1)).cadastraPonto(POST_PONTO_ELETRONICO.getDataHora(), POST_PONTO_ELETRONICO.getDescription());
 	}
 	
 	private PontoEletronicoController newPontoEletronicoController() {
