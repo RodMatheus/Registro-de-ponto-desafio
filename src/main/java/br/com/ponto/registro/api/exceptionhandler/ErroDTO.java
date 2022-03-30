@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Value;
 
 @Builder
-@Getter
+@Value
 @JsonInclude(Include.NON_NULL)
 public class ErroDTO {
 
@@ -24,7 +24,7 @@ public class ErroDTO {
 	}
 	
 	@Builder
-	@Getter
+	@Value
 	protected static class Validacao {
 		private String campo;
 		private String mensagem;

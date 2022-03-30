@@ -64,12 +64,10 @@ public class PontoEletronicoService {
 	}
 
 	private void validaLimiteAlmocoEConflito(final String usuarioLogado, final LocalDateTime horarioInformado) {
-		final LocalDate dataCorrente = (horarioInformado.getDayOfMonth() < LocalDate.now().getDayOfMonth())
-				? horarioInformado.toLocalDate()
-				: LocalDate.now();
+		final LocalDate dataCorrente = horarioInformado.toLocalDate();
 
 		final List<PontoEletronico> horarios = pontoEletronicoRepository
-				.findByUsuarioData(usuarioLogado,dataCorrente);
+				.findByUsuarioData(usuarioLogado, dataCorrente);
 		if (!CollectionUtils.isEmpty(horarios)) {
 			if (horarios.size() == 4) {
 				throw new AcessoNegadoException("Apenas 4 horários podem ser registrados por dia.");

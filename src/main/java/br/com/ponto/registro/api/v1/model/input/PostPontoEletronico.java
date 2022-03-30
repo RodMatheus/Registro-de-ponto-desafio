@@ -6,11 +6,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
 
 @Builder
 @Value
+@Schema(name = "Momento")
 public class PostPontoEletronico {
 
 	@NotNull(message = "O horário deve ser obrigatório!")

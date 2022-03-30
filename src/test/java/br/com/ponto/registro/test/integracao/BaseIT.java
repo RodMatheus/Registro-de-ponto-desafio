@@ -24,23 +24,23 @@ import br.com.ponto.registro.domain.exception.AplicacaoException;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BaseIT extends ResourceIT {
 	
-	private static String URL_TOKEN = "realms/ilia_ponto/protocol/openid-connect/token";
-	
+	private static final String URL_TOKEN = "realms/ilia_ponto/protocol/openid-connect/token";
+	protected String TOKEN;
+
 	@LocalServerPort
 	protected int port;
-	
-	private String authServerUrl;
 
     @BeforeEach
     void setup() {
-        this.authServerUrl = keyckloakContainer.getAuthServerUrl() + URL_TOKEN;
+        this.TOKEN = getToken();
     }
 	
 	protected String getToken() {        
 		try {
+			final String urlServer = keyckloakContainer.getAuthServerUrl() + URL_TOKEN;
 			HttpResponse<String> response  = httpClientOAuth()
 					.send(
-							httpRequestOAuth(this.authServerUrl),
+							httpRequestOAuth(urlServer),
 							BodyHandlers.ofString());
 			return convertAccessToken(response.body());
 		} catch (Exception e) {
@@ -51,7 +51,7 @@ public class BaseIT extends ResourceIT {
 	private HttpClient httpClientOAuth() {
 		return HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(5))
-        .followRedirects(Redirect.NORMAL)
+        .followRedirects(Redirect.NEVER)
         .build();
 	}
 	
@@ -71,7 +71,7 @@ public class BaseIT extends ResourceIT {
 	
 	private String convertAccessToken(final String body) {
         try {
-			JSONObject json = new JSONObject(body);
+			final JSONObject json = new JSONObject(body);
 			return json.getString("access_token");
 		} catch (Exception e) {
 			throw new AplicacaoException("Ocorreu um erro ao buscar o Token de acesso."); 

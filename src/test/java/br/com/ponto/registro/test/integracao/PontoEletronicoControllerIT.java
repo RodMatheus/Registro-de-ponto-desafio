@@ -15,7 +15,7 @@ import io.restassured.http.ContentType;
 public class PontoEletronicoControllerIT extends BaseIT {
 
 	private static final String BASE_PATH = "/batidas";
-
+	
 	@Test
 	@Order(1)
 	public void postPontoEletroniconNaoAutorizado() {
@@ -33,13 +33,12 @@ public class PontoEletronicoControllerIT extends BaseIT {
 	@Test
 	@Order(2)
 	public void postPontoEletronicoCorreto() {
-		String token = getToken();
 		given()
 			.basePath(BASE_PATH)
 			.port(port)
 			.contentType(ContentType.JSON)
 			.auth()
-				.oauth2(token)
+				.oauth2(TOKEN)
 			.body("{\"dataHora\":\"2022-03-23T19:30:25\",\"description\":\"Éhoradoduelo4\"}")
 		.when()
 			.post()
@@ -50,13 +49,12 @@ public class PontoEletronicoControllerIT extends BaseIT {
 	@Test
 	@Order(3)
 	public void postPontoEletronicoConflito() {
-		String token = getToken();
 		given()
 			.basePath(BASE_PATH)
 			.port(port)
 			.contentType(ContentType.JSON)
 			.auth()
-				.oauth2(token)
+				.oauth2(TOKEN)
 			.body("{\"dataHora\":\"2022-03-23T19:30:25\",\"description\":\"Éhoradoduelo4\"}")
 		.when()
 			.post()
@@ -67,13 +65,12 @@ public class PontoEletronicoControllerIT extends BaseIT {
 	@Test
 	@Order(4)
 	public void postPontoEletronicoFinalDeSemana() {
-		String token = getToken();
 		given()
 			.basePath(BASE_PATH)
 			.port(port)
 			.contentType(ContentType.JSON)
 			.auth()
-				.oauth2(token)
+				.oauth2(TOKEN)
 			.body("{\"dataHora\":\"2022-03-19T19:30:25\",\"description\":\"Éhoradoduelo4\"}")
 		.when()
 			.post()
@@ -85,13 +82,12 @@ public class PontoEletronicoControllerIT extends BaseIT {
 	@Order(5)
 	@Sql(scripts = "/sql/insert_data_teste_limite_lista.sql")
 	public void postPontoEletronico() {
-		String token = getToken();
 		given()
 			.basePath(BASE_PATH)
 			.port(port)
 			.contentType(ContentType.JSON)
 			.auth()
-				.oauth2(token)
+				.oauth2(TOKEN)
 			.body("{\"dataHora\":\"2022-03-18T20:30:25\",\"description\":\"Éhoradoduelo4\"}")
 		.when()
 			.post()

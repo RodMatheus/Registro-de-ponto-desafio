@@ -25,7 +25,7 @@ public class PontoEletronico implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public PontoEletronico() {}
+	private PontoEletronico() {}
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +48,14 @@ public class PontoEletronico implements Serializable {
 		ponto.setDescricao(descricao);
 		return ponto;
 	}
+	
+	public static PontoEletronico of(final String usuario, final LocalDateTime horario) {
+		PontoEletronico ponto = new PontoEletronico();
+		ponto.setUsuario(usuario);
+		ponto.setHorario(horario);
+		return ponto;
+	}
+	
 	
 	@Override
 	public int hashCode() {
