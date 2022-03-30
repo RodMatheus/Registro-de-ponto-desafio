@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ponto.registro.api.v1.model.input.PostPontoEletronico;
+import br.com.ponto.registro.api.v1.openapi.PontoEletronicoControllerOpenApi;
 import br.com.ponto.registro.core.security.CheckSecurity;
 import br.com.ponto.registro.domain.service.PontoEletronicoService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController(value = "Controle de horários")
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
-public class PontoEletronicoController {
+public class PontoEletronicoController implements PontoEletronicoControllerOpenApi {
 
 	private final PontoEletronicoService pontoService;
 	

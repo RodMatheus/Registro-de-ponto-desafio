@@ -1,19 +1,19 @@
 package br.com.ponto.registro.domain.model.constants;
 
-import lombok.Getter;
 import java.util.Arrays;
 
 import br.com.ponto.registro.domain.exception.ValidacaoException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public enum OperacaoAuditoria {
 
 	INCLUSAO(1, "Inclusão");
 	
 	private final Integer codigo;
-    private final String nome;
+	private final String nome;
     
     public static OperacaoAuditoria byNome(String nome) {
         return Arrays

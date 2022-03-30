@@ -16,21 +16,19 @@ public abstract class ServiceUtils {
 	}
 
 	public static final String convertToJson(Object obj) {
-		String objeto = conversorToJson(obj)
+		return convertToJsonImpl(obj)
 				.orElseThrow(() -> new AplicacaoException("Ocorreu um erro na conversão de dados."));
-		return objeto;
 	}
 
-	private static final Optional<String> conversorToJson(Object obj) {
-		ObjectMapper mapper = new ObjectMapper();
-	    mapper.registerModule(new JavaTimeModule());
-
-	    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+	private static final Optional<String> convertToJsonImpl(Object obj) {
 		try {
+			ObjectMapper mapper = new ObjectMapper();
+		    mapper.registerModule(new JavaTimeModule());
+		    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		    
 			return Optional.of(mapper.writeValueAsString(obj));
 		} catch (JsonProcessingException e) {
 			throw new AplicacaoException("Ocorreu um erro ao tentar gerar log de auditoria.");
 		}
 	}
-
 }
