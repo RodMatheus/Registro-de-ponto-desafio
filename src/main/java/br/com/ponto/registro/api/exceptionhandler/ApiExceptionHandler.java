@@ -21,6 +21,7 @@ import br.com.ponto.registro.domain.exception.AcessoNaoAutorizadoException;
 import br.com.ponto.registro.domain.exception.AcessoNegadoException;
 import br.com.ponto.registro.domain.exception.AplicacaoException;
 import br.com.ponto.registro.domain.exception.ConflitoException;
+import br.com.ponto.registro.domain.exception.RecursoNaoEncontradoException;
 import br.com.ponto.registro.domain.exception.ValidacaoException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,6 +80,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		ErroDTO response = ErroDTO.builder().mensagem(ex.getMessage()).build();
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+	}
+	
+	@ExceptionHandler(RecursoNaoEncontradoException.class)
+	public final ResponseEntity<ErroDTO> handlerRecursoNaoEncontradoExceptions(RecursoNaoEncontradoException ex, WebRequest request) {
+		log.error("Ocorreu um erro buscar um recurso: ", ex);
+		
+		ErroDTO response = ErroDTO.builder().mensagem(ex.getMessage()).build();
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	}
 	
 	@ExceptionHandler(AccessDeniedException.class)

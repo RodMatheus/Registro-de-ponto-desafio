@@ -1,14 +1,18 @@
 package br.com.ponto.registro.test.unidade.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,15 +29,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import br.com.ponto.registro.domain.exception.AcessoNegadoException;
 import br.com.ponto.registro.domain.exception.ConflitoException;
+import br.com.ponto.registro.domain.exception.RecursoNaoEncontradoException;
 import br.com.ponto.registro.domain.exception.ValidacaoException;
 import br.com.ponto.registro.domain.model.entities.PontoEletronico;
 import br.com.ponto.registro.domain.repository.LogAuditoriaRepository;
 import br.com.ponto.registro.domain.repository.PontoEletronicoRepository;
-import br.com.ponto.registro.domain.service.PontoEletronicoService;
+import br.com.ponto.registro.domain.service.CadastroPontoEletronicoService;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = PontoEletronicoService.class)
-public class PontoServiceTest {
+@SpringBootTest(classes = CadastroPontoEletronicoService.class)
+public class CadastroPontoEletronicoServiceTest {
 
 	private static final LocalDateTime DATA_HORA_FIM_DE_SEMANA_SABADO = LocalDateTime.of(2022, Month.MARCH, 19, 9, 0);
 	private static final LocalDateTime DATA_HORA_FIM_DE_SEMANA_DOMINGO = LocalDateTime.of(2022, Month.MARCH, 20, 9, 0);
@@ -53,6 +58,8 @@ public class PontoServiceTest {
 			PontoEletronico.of("teste", LocalDateTime.now(), "teste"),
 			PontoEletronico.of("teste", LocalDateTime.now(), "teste"),
 			PontoEletronico.of("teste", LocalDateTime.now(), "teste"));
+	
+	private static final PontoEletronico PONTO_ELETRONICO_RECUPERADO = PontoEletronico.of("teste@teste.com", DATA_HORA, "Lançamento de horas!");
 
 	@MockBean
 	private PontoEletronicoRepository pontoEletronicoRepository;
@@ -78,7 +85,7 @@ public class PontoServiceTest {
 	public void deveRetornarErroDeFimDeSemana_sabado() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 
-		PontoEletronicoService pontoService = newPontoService();
+		CadastroPontoEletronicoService pontoService = newCadastroPontoEletronicoService();
 		Executable executable = () -> pontoService.cadastraPonto(
 				DATA_HORA_FIM_DE_SEMANA_SABADO,
 				DESCRICAO_DE_LANCAMENTO);
@@ -90,7 +97,7 @@ public class PontoServiceTest {
 	public void deveRetornarErroDeFimDeSemana_domingo() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 
-		PontoEletronicoService pontoService = newPontoService();
+		CadastroPontoEletronicoService pontoService = newCadastroPontoEletronicoService();
 		Executable executable = () -> pontoService.cadastraPonto(
 				DATA_HORA_FIM_DE_SEMANA_DOMINGO, DESCRICAO_DE_LANCAMENTO);
 
@@ -101,9 +108,9 @@ public class PontoServiceTest {
 	public void deveRetornarErroDeLimiteDeLancamentos() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
-				.thenReturn(LISTA_LIMITE_MAXIMO);
+				.thenReturn(Optional.of(LISTA_LIMITE_MAXIMO));
 
-		PontoEletronicoService pontoService = newPontoService();
+		CadastroPontoEletronicoService pontoService = newCadastroPontoEletronicoService();
 		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA, DESCRICAO_DE_LANCAMENTO);
 
 		assertThrows(AcessoNegadoException.class, executable);
@@ -113,9 +120,9 @@ public class PontoServiceTest {
 	public void deveRetornarErroDeHoraAlmoco() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
-				.thenReturn(LISTA_HORARIO_ALMOCO);
+				.thenReturn(Optional.of(LISTA_HORARIO_ALMOCO));
 
-		PontoEletronicoService pontoService = newPontoService();
+		CadastroPontoEletronicoService pontoService = newCadastroPontoEletronicoService();
 		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA_ALMOCO.plusMinutes(55),
 				DESCRICAO_DE_LANCAMENTO);
 
@@ -126,9 +133,9 @@ public class PontoServiceTest {
 	public void deveRetornarErroDeHorarioJaCadastrado() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
 		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
-				.thenReturn(LISTA_HORARIO_UNICO);
+				.thenReturn(Optional.of(LISTA_HORARIO_UNICO));
 
-		PontoEletronicoService pontoService = newPontoService();
+		CadastroPontoEletronicoService pontoService = newCadastroPontoEletronicoService();
 		Executable executable = () -> pontoService.cadastraPonto(DATA_HORA, DESCRICAO_DE_LANCAMENTO);
 
 		assertThrows(ConflitoException.class, executable);
@@ -137,17 +144,45 @@ public class PontoServiceTest {
 	@Test
 	public void deveCadastrarHorario() {
 		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
-		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate())).thenReturn(List.of());
+		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate())).thenReturn(Optional.ofNullable(List.of()));
 
-		PontoEletronicoService pontoService = newPontoService();
+		CadastroPontoEletronicoService pontoService = newCadastroPontoEletronicoService();
 		pontoService.cadastraPonto(DATA_HORA, DESCRICAO_DE_LANCAMENTO);
 
 		verify(pontoEletronicoRepository, times(1)).findByUsuarioData(null, DATA_HORA.toLocalDate());
 		verify(pontoEletronicoRepository, times(1)).save(any());
 		verify(logAuditoriaRepository, times(1)).save(any());
 	}
+	
+	@Test
+	public void deveRetornarErroDeHorarioNaoEncontrado() {
+		final LocalDate horario = LocalDate.now();
+		
+		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
+		when(pontoEletronicoRepository.findByUsuarioData(null, horario))
+				.thenReturn(Optional.of(List.of()));
 
-	private PontoEletronicoService newPontoService() {
-		return new PontoEletronicoService(pontoEletronicoRepository, logAuditoriaRepository);
+		CadastroPontoEletronicoService pontoService = newCadastroPontoEletronicoService();
+		Executable executable = () -> pontoService.recuperaLancamentos(horario);
+
+		assertThrows(RecursoNaoEncontradoException.class, executable);
+	}
+	
+	@Test
+	public void deveRetornarHorario() {
+		when((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(jwt);
+		when(pontoEletronicoRepository.findByUsuarioData(null, DATA_HORA.toLocalDate()))
+				.thenReturn(Optional.of(List.of(PONTO_ELETRONICO_RECUPERADO)));
+
+		CadastroPontoEletronicoService pontoService = newCadastroPontoEletronicoService();
+		List<PontoEletronico> lancamentos = pontoService.recuperaLancamentos(DATA_HORA.toLocalDate());
+
+		assertNotEquals(lancamentos, List.of());
+		assertEquals(lancamentos.size(), 1);
+		verify(pontoEletronicoRepository, times(1)).findByUsuarioData(null, DATA_HORA.toLocalDate());
+	}
+
+	private CadastroPontoEletronicoService newCadastroPontoEletronicoService() {
+		return new CadastroPontoEletronicoService(pontoEletronicoRepository, logAuditoriaRepository);
 	}
 }

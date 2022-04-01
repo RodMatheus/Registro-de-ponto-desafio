@@ -49,14 +49,6 @@ public class PontoEletronico implements Serializable {
 		return ponto;
 	}
 	
-	public static PontoEletronico of(final String usuario, final LocalDateTime horario) {
-		PontoEletronico ponto = new PontoEletronico();
-		ponto.setUsuario(usuario);
-		ponto.setHorario(horario);
-		return ponto;
-	}
-	
-	
 	@Override
 	public int hashCode() {
 		return Objects.hash(horario, id, usuario);
