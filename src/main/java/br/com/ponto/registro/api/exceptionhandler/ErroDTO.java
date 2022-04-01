@@ -5,6 +5,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
 
@@ -14,6 +15,8 @@ import lombok.Value;
 public class ErroDTO {
 
 	private String mensagem;
+	
+	@Schema(hidden = true)
 	private Set<Validacao> validacoes;
 	
 	public static Validacao ValidacaoOf(final String campo, final String mensagem) {

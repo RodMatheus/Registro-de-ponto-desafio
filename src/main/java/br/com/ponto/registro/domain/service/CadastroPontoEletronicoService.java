@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 import br.com.ponto.registro.core.security.SecurityUtil;
 import br.com.ponto.registro.domain.exception.AcessoNegadoException;
 import br.com.ponto.registro.domain.exception.ConflitoException;
+import br.com.ponto.registro.domain.exception.RecursoNaoEncontradoException;
 import br.com.ponto.registro.domain.exception.ValidacaoException;
 import br.com.ponto.registro.domain.model.entities.LogAuditoria;
 import br.com.ponto.registro.domain.model.entities.PontoEletronico;
@@ -23,18 +24,29 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class PontoEletronicoService {
+public class CadastroPontoEletronicoService {
 
 	private final PontoEletronicoRepository pontoEletronicoRepository;
 	private final LogAuditoriaRepository logAuditoriaRepository;
 
 	@Autowired
-	public PontoEletronicoService(PontoEletronicoRepository pontoEletronicoRepository,
+	public CadastroPontoEletronicoService(PontoEletronicoRepository pontoEletronicoRepository,
 			 LogAuditoriaRepository logAuditoriaRepository) {
 		this.pontoEletronicoRepository = pontoEletronicoRepository;
 		this.logAuditoriaRepository = logAuditoriaRepository;
 	}
 
+	public List<PontoEletronico> recuperaLancamentos(LocalDate data) {
+		final String usuarioLogado = SecurityUtil.getUsuarioLogado();
+		
+		log.info("Recuperando lista de lançamentos por usuário e data. USUÁRIO: {}, DATA: {}.", usuarioLogado, data);
+		return pontoEletronicoRepository.findByUsuarioData(usuarioLogado, data)
+				.map(lista -> lista)
+				.filter(lista -> !lista.isEmpty())
+				.orElseThrow(() -> new RecursoNaoEncontradoException(
+						"Nenhum registro de lançamento foi encontrado em: " + data));
+	}
+	
 	@Transactional
 	public void cadastraPonto(final LocalDateTime horario, final String descricao) {
 		final String usuarioLogado = SecurityUtil.getUsuarioLogado();
@@ -67,7 +79,8 @@ public class PontoEletronicoService {
 		final LocalDate dataCorrente = horarioInformado.toLocalDate();
 
 		final List<PontoEletronico> horarios = pontoEletronicoRepository
-				.findByUsuarioData(usuarioLogado, dataCorrente);
+				.findByUsuarioData(usuarioLogado, dataCorrente)
+				.orElse(List.of());
 		if (!CollectionUtils.isEmpty(horarios)) {
 			if (horarios.size() == 4) {
 				throw new AcessoNegadoException("Apenas 4 horários podem ser registrados por dia.");

@@ -232,6 +232,7 @@
 								<exclude>br/com/ponto/registro/domain/exception/**</exclude>
 								<exclude>br/com/ponto/registro/core/**</exclude>
 								<exclude>br/com/ponto/registro/api/exceptionhandler/**</exclude>
+								<exclude>br/com/ponto/registro/api/v1/mapper/**</exclude>
 							</excludes>
 						</configuration>
 					</execution>
