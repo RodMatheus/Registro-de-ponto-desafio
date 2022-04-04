@@ -59,7 +59,7 @@ public class BaseIT extends ResourceIT {
 		final String authParams = 
 				  "grant_type=password"
                 + "&client_id=ponto-client"
-                + "&username=rodmatheus96@gmail.com"
+                + "&username=teste@teste"
                 + "&password=asdf1234";
 		
 		return HttpRequest.newBuilder()
