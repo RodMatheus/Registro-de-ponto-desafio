@@ -109,7 +109,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		Set<Validacao> validacoes = ex.getBindingResult().getFieldErrors().stream()
 				.map(campo -> {
 					String mensagem = messageSource.getMessage(campo, LocaleContextHolder.getLocale());
-					return ErroDTO.ValidacaoOf(campo.getField(), mensagem);
+					return ErroDTO.validacaoOf(campo.getField(), mensagem);
 					})
 				.collect(Collectors.toSet());
 		
