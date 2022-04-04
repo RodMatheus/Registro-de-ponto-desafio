@@ -19,7 +19,7 @@ public class ErroDTO {
 	@Schema(hidden = true)
 	private Set<Validacao> validacoes;
 	
-	public static Validacao ValidacaoOf(final String campo, final String mensagem) {
+	public static Validacao validacaoOf(final String campo, final String mensagem) {
 		return Validacao.builder()
 				.campo(campo)
 				.mensagem(mensagem)
