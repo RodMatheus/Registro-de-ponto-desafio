@@ -2145,10 +2145,10 @@
   "users": [ 
     {
       "id" : "c0f375d0-5565-4856-8520-22aa19a07a8f",
-      "username" : "teste@teste",
+      "username" : "teste@teste.com",
       "firstName" : "Teste",
       "lastName" : "Teste",
-      "email" : "teste@teste",
+      "email" : "teste@teste.com",
       "enabled" : true,
       "totp" : false,
       "emailVerified" : false,
